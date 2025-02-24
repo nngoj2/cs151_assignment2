@@ -1,3 +1,9 @@
+/**
+ * CIS151 Spring 2025 Assignment 2 Solution
+ * @author Nam Tan Ngo
+ * @version 1.0 02/23/2025
+ */
+
 package ReservationSystem_package;
 
 import java.io.BufferedReader;
@@ -11,12 +17,21 @@ import java.util.PriorityQueue;
 import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
+/**
+ * The system that control seat/user in the system
+ * it can print available/reserve seat from the system and user
+ * it can add/remove seat from system to user and reverse
+ * It control sign-in/sign-up of public user and administrator
+ * it control read/write user, reservation files
+ */
 public class Connection {
 	private HashMap<Integer, User> users;
 	private HashMap<Integer, User> employees;
-
 	private HashMap<Integer, HashMap<Character, Seat>> seats;	
+	
+	/**
+	 * Construct a new connection object
+	 */
 	public Connection() {
 		users = new HashMap<>();
 		employees = new HashMap<>();
@@ -40,21 +55,25 @@ public class Connection {
 		
 	}
 	
+	/**
+	 * check if the system has any seat available
+	 * @return false if out of seat, true otherwise
+	 */
 	public boolean outOfSeat() {return seats.isEmpty();}
 
-	
+	/**
+	 * print out all seat in the system that is available
+	 */
 	public void printAvailability() {
 		System.out.println("Seat Availability");
 		
 		if(!seats.isEmpty()) {
 			for( Integer column: seats.keySet()) {
-				
 				switch(column) {
 				case 1 -> System.out.println("\nFirst (price: $1000/seat)");
 				case 5 -> System.out.println("\nEconomy Plus (price: $500/seat)");
 				case 16 -> System.out.println("\nEconomy (price: $250/seat)");
-				}
-				
+				}			
 				System.out.printf("%2d: ",column);
 				String delimiter ="";
 				if(!seats.get(column).isEmpty()) {
@@ -68,6 +87,10 @@ public class Connection {
 		}		
 	}
 	
+	/**
+	 * print out the detail of seat
+	 * @param seat - a seat in system or hold by a user
+	 */
 	public void printSeat(Seat seat) {
 		System.out.println("Seat Location: "+seat.getLocation());
 		System.out.println("Service type: "+seat.getType());
@@ -75,6 +98,13 @@ public class Connection {
 
 	}
 	
+	/**
+	 * return a seat with specific location
+	 * @param column - column of location
+	 * @param row - row of location
+	 * @return	the seat in that location
+	 * @throws IllegalArgumentException if the seat has been taken or doesn't exist in that location
+	 */
 	public Seat getSeat(int column, char row) {
 		if(seats.containsKey(column)) {
 			if(seats.get(column).containsKey(row)) {
@@ -85,9 +115,14 @@ public class Connection {
 		throw new IllegalArgumentException("input invalid, this seat number doesn't exist");
 	}
 	
-	
-	
-	
+	/**
+	 * sign up a user into the system
+	 * @param name - name of the user
+	 * @param id - id of the account
+	 * @param password - password of the account
+	 * @return true if sign up successfully, false otherwise
+	 * @throws IllegalArgumentException if name or password contain '/space/'
+	 */
 	public boolean signUp(String name, int id, String password) {
 		if(password.contains("/space/") || name.contains("/space/")) {
 			throw new IllegalArgumentException("input invalid, password or name cannot contain /space/");
@@ -96,6 +131,13 @@ public class Connection {
 		return true;
 	}
 	
+	/**
+	 * return user data type with specific id and password
+	 * @param id - id of the account
+	 * @param password - password of the account
+	 * @return user - user account with specific id and password
+	 * @throws IllegalArgumentException if id or password is incorrect
+	 */
 	public User signIn(int id, String password) {
 		if(users.containsKey(id)) {
 			User user = users.get(id);
@@ -107,6 +149,13 @@ public class Connection {
 		throw new IllegalArgumentException("incorrect ID");
 	}
 	
+	/**
+	 * return user data type of administrator with specific id and password
+	 * @param id - id of the account
+	 * @param password - password of the account
+	 * @return user - administrator account with specific id and password
+	 * @throws IllegalArgumentException if id or password is incorrect
+	 */
 	public User adminSignIn(int id, String password) {
 		if(employees.containsKey(id)) {
 			User user = employees.get(id);
@@ -118,8 +167,14 @@ public class Connection {
 		throw new IllegalArgumentException("incorrect ID");
 	}
 	
-	
-	
+	/**
+	 * make an reservation for user with specific seat
+	 * @param user - user that seat will be added to
+	 * @param column - column location of seat will add to an account
+	 * @param row- row location of seat will add to an account
+	 * @return true of reservation making success
+	 * @throws transfer error report from inner layer
+	 */
 	public boolean makeReservation(User user, int column, char row) {
 		try {
 			user.addSeat(getSeat(column, row));
@@ -131,6 +186,10 @@ public class Connection {
 		
 	}
 	
+	/**
+	 * print the detail of all reservation of a user
+	 * @param user - account that hold reservation seat that will be printed out
+	 */
 	public void viewReservation(User user) {
 		if(!user.getSeats().isEmpty()) {
 			System.out.println("Name: "+user.getName());
@@ -146,7 +205,13 @@ public class Connection {
 		
 	}
 	
-	
+	/**
+	 * remove a seat reservation of a user
+	 * @param user - user who hold the seat
+	 * @param column - column location of the seat
+	 * @param row - row location of the seat
+	 * @return true if the cancel success, false otherwise
+	 */
 	public boolean cancelReservation(User user, int column, char row) {
 		try {
 			seats.get(column).put(row, user.removeSeat(column, row));
@@ -157,6 +222,9 @@ public class Connection {
 		}
 	}
 	
+	/**
+	 * print all reservation that has been made
+	 */
 	public void printListOfReservations() {
 		TreeMap<Seat, String> tempTreeMap = new TreeMap<>();
 		if(!users.isEmpty()) {
@@ -177,10 +245,13 @@ public class Connection {
 		
 	}
 	
-	
-	
-	
-	
+	/**
+	 * read data from the user file which contain all user information
+	 * @param fileName - name of the file
+	 * @return true if open and read file success
+	 * @throws FileNotFoundException if file not found
+	 * @throws IOException if error occur
+	 */
 	public boolean readUserFile(String fileName) {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(fileName));
@@ -205,6 +276,13 @@ public class Connection {
 		return true;
 	}
 	
+	/**
+	 * read data from the reservation file which contain all reservation information
+	 * @param fileName - name of the file
+	 * @return true if open and read file success
+	 * @throws FileNotFoundException if file not found
+	 * @throws IOException if error occur
+	 */
 	public boolean readReservationFile(String fileName) {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(fileName));
@@ -241,12 +319,13 @@ public class Connection {
 		return true;
 	}
 	
-	
-	
-	
-	
-	
-	
+	/**
+	 * write data to the user file 
+	 * @param fileName - name of the file
+	 * @return true if open and write file success
+	 * @throws FileNotFoundException if file not found
+	 * @throws IOException if error occur
+	 */
 	public boolean writeFile(String userFile, String reservationFile) {
 		return writeUserFile(userFile) && writeReservationFile(reservationFile);
 	}
@@ -269,8 +348,13 @@ public class Connection {
 		return true;
 	}
 	
-	
-	
+	/**
+	 * write data to the reservation file 
+	 * @param fileName - name of the file
+	 * @return true if open and write file success
+	 * @throws FileNotFoundException if file not found
+	 * @throws IOException if error occur
+	 */
 	public boolean writeReservationFile(String reservationFile) {
 		String delimiter ="/space/";
 		try {
@@ -294,7 +378,4 @@ public class Connection {
 		}
 		return true;
 	}
-	
-	
-	
 }

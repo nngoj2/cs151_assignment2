@@ -1,8 +1,17 @@
+/**
+ * CIS151 Spring 2025 Assignment 2 Solution
+ * @author Nam Tan Ngo
+ * @version 1.0 02/23/2025
+ */
+
 package ReservationSystem_package;
 
 import java.io.File;
 import java.util.Scanner;
-
+/**
+ * this class is the main to run test on reservation system
+ * it ensures the smoothly connection between the user and the system
+ */
 public class ReservationSystem {
 
 	public static void main(String[] args) {
